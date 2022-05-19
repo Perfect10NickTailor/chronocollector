@@ -28,6 +28,11 @@
     group: root
     mode: 0644
 
+- name: Touch again the same file, but do not change times this makes the task idempotent
+  ansible.builtin.file:
+    path: /etc/chronocollector/apitoken
+    state: touch
+
 #you could change this and use a ansible vault encrypted variable, but this way you can pass the key during runtime and dont need to store 
 #sensitive keys in your code repos.
 - name: Ensure API key is present in config file
@@ -35,7 +40,7 @@
     path: /etc/chronocollector/apitoken
     line: "API_KEY={{ api_key }}"
 
-- name: Change file ownership, group and permissions apitoken file
+- name: Change file ownership, group and permissions apitoken file to secure it from prying eyes other than root
   ansible.builtin.file:
     path: /etc/chronocollector/apitoken
     owner: root
