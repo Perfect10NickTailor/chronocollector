@@ -1,0 +1,72 @@
+
+- name: download node collector
+  get_url:
+    url: https://storage.googleapis.com/chronosphere-release/latest/chronocollector-linux-amd64
+    dest: /tmp
+
+- name: move collector to /usr/local/bin
+  copy:
+    src: /tmp/chronocollector-linux-amd64
+    dest: /usr/local/bin/chronocollector
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0755
+
+- name: mkdir directory /etc/chronocollector
+  file:
+    path: /etc/chronocollector
+    state: directory
+
+#check defaults/main.yaml for parameters being passed such as api_token_file and target_hosts 
+#if you are adding a new host you need to specify target_hosts
+- name: Copy default config.yml to /etc/chronocollector/
+  template:
+    src: templates/config.yml
+    dest: /etc/chronocollector/config.yml
+    owner: root
+    group: root
+    mode: 0644
+
+#you could change this and use a ansible vault encrypted variable, but this way you can pass the key during runtime and dont need to store 
+#sensitive keys in your code repos.
+- name: Ensure API key is present in config file
+  ansible.builtin.lineinfile:
+    path: /etc/chronocollector/apitoken
+    line: "API_KEY={{ api_key }}"
+
+- name: Change file ownership, group and permissions apitoken file
+  ansible.builtin.file:
+    path: /etc/chronocollector/apitoken
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Check that the service file /etc/systemd/system/collector.service exists
+  stat:
+    path: /etc/systemd/system/collector.service
+  register: stat_result
+
+- name: Include add systemd task if service file does not exist
+  include_tasks: systemd.yml
+  when: not stat_result.stat.exists
+
+- name: check whether custom line exists
+  lineinfile:
+    path: /etc/systemd/system/collector.service
+    regexp: '^ExecStart'
+    state: absent
+  check_mode: true
+  register: line_exists
+
+- name: Start Collector Service via systemd
+  shell: systemctl start collector.service
+  when: line_exists
+
+- name: Show status of collector from systemd
+  shell: systemctl status collector.service | grep -i active
+  register: status
+
+- debug:
+    var: status.stdout
+

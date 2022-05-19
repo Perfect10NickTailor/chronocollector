@@ -1,0 +1,23 @@
+- name: Create startup file for collector in systemd
+  file: 
+    path: /etc/systemd/system/collector.service
+    state: touch
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Create systemd collector.service
+  blockinfile:
+    dest: /etc/systemd/system/collector.service
+    insertafter:
+    block: |
+      [Unit]
+      Description=Collector
+      After=network.target
+      
+      [Service]
+      Type=simple
+      ExecStart=/usr/local/bin/chronocollector -f /etc/chronocollector/config.yml
+      
+      [Install]
+      WantedBy=multi-user.target

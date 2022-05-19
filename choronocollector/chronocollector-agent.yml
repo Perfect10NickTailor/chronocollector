@@ -1,0 +1,7 @@
+- hosts: all
+  gather_facts: no
+  vars_prompt:
+  - name: api_key
+    prompt: Enter the API key
+  roles: 
+    - role: chronocollector

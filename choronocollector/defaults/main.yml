@@ -1,0 +1,6 @@
+api_token_file: /etc/chronocollector/apitoken
+gateway_addresses: nicktailor.chronosphere.io:443
+targets_hosts: "'192.168.10.10:9100', '192.168.10.11:9100'"
+chronocollector:
+  labels:
+    organization: nicktailor_hosts
