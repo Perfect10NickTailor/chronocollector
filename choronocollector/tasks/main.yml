@@ -38,7 +38,7 @@
 - name: Ensure API key is present in config file
   ansible.builtin.lineinfile:
     path: /etc/chronocollector/apitoken
-    line: "API_KEY={{ api_key }}"
+    line: "{{ api_key }}"
 
 - name: Change file ownership, group and permissions apitoken file to secure it from prying eyes other than root
   ansible.builtin.file:
