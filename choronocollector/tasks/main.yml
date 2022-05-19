@@ -34,7 +34,7 @@
     state: touch
 
 #you could change this and use a ansible vault encrypted variable, but this way you can pass the key during runtime and dont need to store 
-#sensitive keys in your code repos.
+#sensitive keys in your code repos, check the chronocollector.yml as this variable is passed at run time there.
 - name: Ensure API key is present in config file
   ansible.builtin.lineinfile:
     path: /etc/chronocollector/apitoken
